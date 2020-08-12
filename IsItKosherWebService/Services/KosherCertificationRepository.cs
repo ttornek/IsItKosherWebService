@@ -50,17 +50,31 @@ namespace IsItKosherWebService.Services
 
         public IEnumerable<KosherCertification> GetKosherCertifications()
         {
-            throw new NotImplementedException();
+            return _context.KosherCertifications.ToList<KosherCertification>();
+
         }
 
         public KosherSymbol GetKosherSymbol(Guid kosherCertificationId, Guid kosherSymbolId)
         {
-            throw new NotImplementedException();
+
+            if (kosherCertificationId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationId));
+            }
+
+            if (kosherSymbolId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherSymbolId));
+            }
+
+           return _context.KosherSymbols
+                .Where(k => k.KosherCertificationId == kosherCertificationId && k.Id == kosherSymbolId)
+                .FirstOrDefault();
         }
 
         public IEnumerable<KosherSymbol> GetKosherSymbols(Guid kosherCertificationId)
         {
-            if (kosherCertificationId == null)
+            if (kosherCertificationId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(kosherCertificationId));
             }
@@ -71,17 +85,28 @@ namespace IsItKosherWebService.Services
 
         public IEnumerable<Location> GetLocations(Guid kosherCertificationId)
         {
-            throw new NotImplementedException();
+            if (kosherCertificationId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationId));
+            }
+
+            return _context.Locations
+                .Where(l => l.KosherCertificationId==kosherCertificationId).ToList();
         }
 
-        public bool KosherCertificationExists()
+        public bool KosherCertificationExists(Guid kosherCertificationId)
         {
-            throw new NotImplementedException();
+
+            if (kosherCertificationId ==Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationId));
+            }
+            return _context.KosherCertifications.Any(k=>k.Id==kosherCertificationId);
         }
 
         public bool Save()
         {
-            throw new NotImplementedException();
+         return _context.SaveChanges()>0;
         }
         protected virtual void Dispose(bool disposing)
         {

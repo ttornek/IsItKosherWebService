@@ -17,7 +17,7 @@ namespace IsItKosherWebService.Services
         IEnumerable<KosherCertification> GetKosherCertification(KosherCertificationResourceParameters kosherCertificationResourseParams);
         void AddKosherCertification(KosherCertification kosherCertification);
         void DeleteKosherCertification();
-        bool KosherCertificationExists();
+        bool KosherCertificationExists(Guid kosherCertificationId);
         bool Save();
 
 
