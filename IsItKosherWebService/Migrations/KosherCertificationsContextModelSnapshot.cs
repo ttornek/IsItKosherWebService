@@ -26,11 +26,10 @@ namespace IsItKosherWebService.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PhoneNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RabbiFirstName")
                         .HasColumnType("nvarchar(max)");
@@ -41,6 +40,16 @@ namespace IsItKosherWebService.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("KosherCertifications");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35"),
+                            Name = "Ok Kosher",
+                            PhoneNumber = "6462714233",
+                            RabbiFirstName = "Rabbi Tzvi",
+                            RabbiLastName = "Tornek"
+                        });
                 });
 
             modelBuilder.Entity("IsItKosherWebService.Entities.KosherSymbol", b =>
@@ -50,7 +59,6 @@ namespace IsItKosherWebService.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("Image")
-                        .IsRequired()
                         .HasColumnType("image");
 
                     b.Property<string>("ImageDescription")
@@ -64,6 +72,15 @@ namespace IsItKosherWebService.Migrations
                     b.HasIndex("KosherCertificationId");
 
                     b.ToTable("KosherSymbols");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35"),
+                            Image = new byte[0],
+                            ImageDescription = "k inside of a circle",
+                            KosherCertificationId = new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35")
+                        });
                 });
 
             modelBuilder.Entity("IsItKosherWebService.Entities.Location", b =>
@@ -101,6 +118,20 @@ namespace IsItKosherWebService.Migrations
                     b.HasIndex("KosherCertificationId");
 
                     b.ToTable("Locations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("d8663e5e-7494-4f81-8739-6e0de1bea7ee"),
+                            City = "brooklyn",
+                            Country = "USA",
+                            KosherCertificationId = new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35"),
+                            Latitude = 200f,
+                            Longitude = 100f,
+                            State = "Ny",
+                            Street = "1417 east 16th street",
+                            ZipCode = 11225
+                        });
                 });
 
             modelBuilder.Entity("IsItKosherWebService.Entities.KosherSymbol", b =>

@@ -13,7 +13,7 @@ namespace IsItKosherWebService.Entities
         public Guid Id { get; set; }
         public string ImageDescription { get; set; }
 
-        [Required]
+       
         [Column(TypeName ="image")]
         public byte[] Image { get; set; }
 

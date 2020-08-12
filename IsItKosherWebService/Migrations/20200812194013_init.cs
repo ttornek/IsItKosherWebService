@@ -12,10 +12,10 @@ namespace IsItKosherWebService.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RabbiFirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RabbiLastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<int>(type: "int", nullable: false)
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -28,7 +28,7 @@ namespace IsItKosherWebService.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ImageDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Image = table.Column<byte[]>(type: "image", nullable: false),
+                    Image = table.Column<byte[]>(type: "image", nullable: true),
                     KosherCertificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -66,6 +66,21 @@ namespace IsItKosherWebService.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "KosherCertifications",
+                columns: new[] { "Id", "Name", "PhoneNumber", "RabbiFirstName", "RabbiLastName" },
+                values: new object[] { new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35"), "Ok Kosher", "6462714233", "Rabbi Tzvi", "Tornek" });
+
+            migrationBuilder.InsertData(
+                table: "KosherSymbols",
+                columns: new[] { "Id", "Image", "ImageDescription", "KosherCertificationId" },
+                values: new object[] { new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35"), new byte[0], "k inside of a circle", new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35") });
+
+            migrationBuilder.InsertData(
+                table: "Locations",
+                columns: new[] { "Id", "City", "Country", "KosherCertificationId", "Latitude", "Longitude", "State", "Street", "ZipCode" },
+                values: new object[] { new Guid("d8663e5e-7494-4f81-8739-6e0de1bea7ee"), "brooklyn", "USA", new Guid("d28888e9-2ba9-473a-a40f-e38cb54f9b35"), 200f, 100f, "Ny", "1417 east 16th street", 11225 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_KosherSymbols_KosherCertificationId",

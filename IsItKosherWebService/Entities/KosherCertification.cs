@@ -12,11 +12,11 @@ namespace IsItKosherWebService.Entities
         [Key]
         public Guid Id { get; set; }
      
-        [Required]
+    
         public string Name { get; set; }
         public string RabbiFirstName { get; set; }
         public string RabbiLastName { get; set; }
-        public int PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
         public List<Location> Locations { get; set; }
         = new List<Location>();
