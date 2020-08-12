@@ -17,7 +17,20 @@ namespace IsItKosherWebService.Services
         }
         public void AddKosherCertification(KosherCertification kosherCertification)
         {
-            throw new NotImplementedException();
+            if (kosherCertification == null)
+            {
+                throw new ArgumentNullException(nameof(kosherCertification));
+            }
+        //    kosherCertification.Id = Guid.NewGuid();
+            //foreach (var kosherSymbol in kosherCertification.KosherSymbols)
+            //{
+            //    kosherSymbol.Id = Guid.NewGuid();
+            //}
+            //foreach (var location in kosherCertification.Locations)
+            //{
+            //    location.Id = Guid.NewGuid();
+            //}
+            _context.KosherCertifications.Add(kosherCertification);
 
         }
 
