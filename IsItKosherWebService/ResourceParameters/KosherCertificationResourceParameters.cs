@@ -7,5 +7,10 @@ namespace IsItKosherWebService.ResourceParameters
 {
     public class KosherCertificationResourceParameters
     {
+        public string Name { get; set; }
+
+        public string SearchQuery { get; set; }
+
+
     }
 }

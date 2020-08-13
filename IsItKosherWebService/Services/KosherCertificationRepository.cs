@@ -58,7 +58,41 @@ namespace IsItKosherWebService.Services
 
         public IEnumerable<KosherCertification> GetKosherCertification(KosherCertificationResourceParameters kosherCertificationResourseParams)
         {
-            throw new NotImplementedException();
+            if (kosherCertificationResourseParams == null)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationResourseParams));
+            }
+
+            if (string.IsNullOrWhiteSpace(kosherCertificationResourseParams.Name) 
+                && string.IsNullOrWhiteSpace(kosherCertificationResourseParams.SearchQuery))
+            {
+                return GetKosherCertifications();
+            }
+            var collection = _context.KosherCertifications as IQueryable<KosherCertification>;
+            //filter
+            if (!string.IsNullOrWhiteSpace(kosherCertificationResourseParams.Name))
+            {
+                var name = kosherCertificationResourseParams.Name.Trim();
+                collection = _context.KosherCertifications.Where(k => k.Name == name);
+            }
+            //search the koshercertificatons 
+            if (!string.IsNullOrWhiteSpace(kosherCertificationResourseParams.SearchQuery))
+            {
+                var searchQuery = kosherCertificationResourseParams.SearchQuery.Trim();
+                collection = collection.Where(k => k.Name.Contains(searchQuery)
+                 || k.RabbiFirstName.Contains(searchQuery)
+                 || k.RabbiLastName.Contains(searchQuery)
+                 || k.PhoneNumber.Contains(searchQuery)
+                 || k.Locations.Any(l => l.Country.Contains(searchQuery)
+                 ||l.City.Contains(searchQuery)
+                 ||l.ZipCode==int.Parse(searchQuery)
+                 ||l.Street.Contains(searchQuery)));
+                
+                
+            }
+
+
+            return collection.ToList();
         }
 
         public IEnumerable<KosherCertification> GetKosherCertifications()
