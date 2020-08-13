@@ -1,6 +1,7 @@
 ﻿using IsItKosherWebService.DbContexts;
 using IsItKosherWebService.Entities;
 using IsItKosherWebService.ResourceParameters;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,20 +9,21 @@ using System.Threading.Tasks;
 
 namespace IsItKosherWebService.Services
 {
-    public class KosherCertificationRepository : IKosherCertificationRepository, IDisposable
+    public class KosherCertificationRepository : IDisposable, IKosherCertificationRepository
     {
         private readonly KosherCertificationsContext _context;
         public KosherCertificationRepository(KosherCertificationsContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
+
         public void AddKosherCertification(KosherCertification kosherCertification)
         {
             if (kosherCertification == null)
             {
                 throw new ArgumentNullException(nameof(kosherCertification));
             }
-        //    kosherCertification.Id = Guid.NewGuid();
+            //    kosherCertification.Id = Guid.NewGuid();
             //foreach (var kosherSymbol in kosherCertification.KosherSymbols)
             //{
             //    kosherSymbol.Id = Guid.NewGuid();
@@ -30,14 +32,28 @@ namespace IsItKosherWebService.Services
             //{
             //    location.Id = Guid.NewGuid();
             //}
-            _context.KosherCertifications.Add(kosherCertification);
+            _context.KosherCertifications.AddAsync(kosherCertification);
 
         }
 
-        public void DeleteKosherCertification()
+        public async Task AddKosherCertificationAsync(KosherCertification kosherCertification)
+        {
+
+            if (kosherCertification == null)
+            {
+                throw new ArgumentNullException(nameof(kosherCertification));
+            }
+
+            await _context.KosherCertifications.AddAsync(kosherCertification);
+
+        }
+
+        public void DeleteKosherCertification(KosherCertification kosherCertification)
         {
             throw new NotImplementedException();
         }
+
+
 
         public void Dispose()
         {
@@ -56,20 +72,55 @@ namespace IsItKosherWebService.Services
                   .Where(k => k.Id == kosherCertificationId).FirstOrDefault();
         }
 
+        public async Task<KosherCertification> GetKosherCertificationAsync(Guid kosherCertificationId)
+        {
+            if (kosherCertificationId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationId));
+            }
+
+            return await _context.KosherCertifications
+                  .Where(k => k.Id == kosherCertificationId).FirstOrDefaultAsync();
+        }
+
         public IEnumerable<KosherCertification> GetKosherCertification(KosherCertificationResourceParameters kosherCertificationResourseParams)
         {
+
             if (kosherCertificationResourseParams == null)
             {
                 throw new ArgumentNullException(nameof(kosherCertificationResourseParams));
             }
 
-            if (string.IsNullOrWhiteSpace(kosherCertificationResourseParams.Name) 
+            if (string.IsNullOrWhiteSpace(kosherCertificationResourseParams.Name)
                 && string.IsNullOrWhiteSpace(kosherCertificationResourseParams.SearchQuery))
             {
                 return GetKosherCertifications();
             }
+
+
+            return BuildSearchCollection(kosherCertificationResourseParams).ToList();
+
+        }
+
+        public async Task<IEnumerable<KosherCertification>> GetKosherCertificationsAsync(KosherCertificationResourceParameters kosherCertificationResourceParams)
+        {
+            if (kosherCertificationResourceParams == null)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationResourceParams));
+            }
+
+            if (string.IsNullOrWhiteSpace(kosherCertificationResourceParams.Name)
+                && string.IsNullOrWhiteSpace(kosherCertificationResourceParams.SearchQuery))
+            {
+                return GetKosherCertificationsAsync() as IEnumerable<KosherCertification>;//no idea if i should do this
+            }
+            return await BuildSearchCollection(kosherCertificationResourceParams).ToListAsync();
+        }
+
+
+        private IQueryable<KosherCertification> BuildSearchCollection(KosherCertificationResourceParameters kosherCertificationResourseParams)
+        {
             var collection = _context.KosherCertifications as IQueryable<KosherCertification>;
-            //filter
             if (!string.IsNullOrWhiteSpace(kosherCertificationResourseParams.Name))
             {
                 var name = kosherCertificationResourseParams.Name.Trim();
@@ -84,22 +135,26 @@ namespace IsItKosherWebService.Services
                  || k.RabbiLastName.Contains(searchQuery)
                  || k.PhoneNumber.Contains(searchQuery)
                  || k.Locations.Any(l => l.Country.Contains(searchQuery)
-                 ||l.City.Contains(searchQuery)
-                 ||l.ZipCode==int.Parse(searchQuery)
-                 ||l.Street.Contains(searchQuery)));
-                
-                
+                 || l.City.Contains(searchQuery)
+                 || l.ZipCode == int.Parse(searchQuery)
+                 || l.Street.Contains(searchQuery)));
+
+
             }
-
-
-            return collection.ToList();
+            return collection;
         }
 
         public IEnumerable<KosherCertification> GetKosherCertifications()
         {
-            return _context.KosherCertifications.ToList<KosherCertification>();
+            return _context.KosherCertifications.ToList();
 
         }
+
+        private async Task<IEnumerable<KosherCertification>> GetKosherCertificationsAsync()
+        {
+            return await _context.KosherCertifications.ToListAsync();
+        }
+
 
         public KosherSymbol GetKosherSymbol(Guid kosherCertificationId, Guid kosherSymbolId)
         {
@@ -114,9 +169,26 @@ namespace IsItKosherWebService.Services
                 throw new ArgumentNullException(nameof(kosherSymbolId));
             }
 
-           return _context.KosherSymbols
-                .Where(k => k.KosherCertificationId == kosherCertificationId && k.Id == kosherSymbolId)
-                .FirstOrDefault();
+            return _context.KosherSymbols
+                 .Where(k => k.KosherCertificationId == kosherCertificationId && k.Id == kosherSymbolId)
+                 .FirstOrDefault();
+        }
+        public async Task<KosherSymbol> GetKosherSymbolAsync(Guid kosherCertificationId, Guid kosherSymbolId)
+        {
+
+            if (kosherCertificationId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationId));
+            }
+
+            if (kosherSymbolId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherSymbolId));
+            }
+
+            return await _context.KosherSymbols
+                 .Where(k => k.KosherCertificationId == kosherCertificationId && k.Id == kosherSymbolId)
+                 .FirstOrDefaultAsync();
         }
 
         public IEnumerable<KosherSymbol> GetKosherSymbols(Guid kosherCertificationId)
@@ -129,6 +201,16 @@ namespace IsItKosherWebService.Services
             return _context.KosherSymbols
                 .Where(ks => ks.KosherCertificationId == kosherCertificationId).ToList();
         }
+        public async Task<IEnumerable<KosherSymbol>> GetKosherSymbolsAsync(Guid kosherCertificationId)
+        {
+            if (kosherCertificationId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationId));
+            }
+
+            return await _context.KosherSymbols
+                .Where(ks => ks.KosherCertificationId == kosherCertificationId).ToListAsync();
+        }
 
         public IEnumerable<Location> GetLocations(Guid kosherCertificationId)
         {
@@ -138,22 +220,45 @@ namespace IsItKosherWebService.Services
             }
 
             return _context.Locations
-                .Where(l => l.KosherCertificationId==kosherCertificationId).ToList();
+                .Where(l => l.KosherCertificationId == kosherCertificationId).ToList();
+        }
+        public async Task<IEnumerable<Location>> GetLocationsAsync(Guid kosherCertificationId)
+        {
+            if (kosherCertificationId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationId));
+            }
+
+            return await _context.Locations
+                .Where(l => l.KosherCertificationId == kosherCertificationId).ToListAsync();
         }
 
         public bool KosherCertificationExists(Guid kosherCertificationId)
         {
 
-            if (kosherCertificationId ==Guid.Empty)
+            if (kosherCertificationId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(kosherCertificationId));
             }
-            return _context.KosherCertifications.Any(k=>k.Id==kosherCertificationId);
+            return _context.KosherCertifications.Any(k => k.Id == kosherCertificationId);
+        }
+        public async Task<bool> KosherCertificationExistsAsync(Guid kosherCertificationId)
+        {
+
+            if (kosherCertificationId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationId));
+            }
+            return await _context.KosherCertifications.AnyAsync(k => k.Id == kosherCertificationId);
         }
 
         public bool Save()
         {
-         return _context.SaveChanges()>0;
+            return _context.SaveChanges() > 0;
+        }
+        public async Task<bool> SaveAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
         protected virtual void Dispose(bool disposing)
         {
@@ -163,5 +268,5 @@ namespace IsItKosherWebService.Services
             }
         }
     }
-    
+
 }

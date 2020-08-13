@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using IsItKosherWebService.DbContexts;
 using IsItKosherWebService.Entities;
+using IsItKosherWebService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -34,7 +35,12 @@ namespace IsItKosherWebService
                 setupAction.ReturnHttpNotAcceptable = true;
             }).AddXmlDataContractSerializerFormatters();
 
+      
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.AddScoped<IKosherCertificationRepository, KosherCertificationRepository>();
+
             services.AddDbContext<KosherCertificationsContext>(options =>
             {
                 options.UseSqlServer(
@@ -61,6 +67,7 @@ namespace IsItKosherWebService
             {
                 endpoints.MapControllers();
             });
+
         }
     }
 }
