@@ -69,7 +69,7 @@ namespace IsItKosherWebService.Services
             }
 
             return _context.KosherCertifications
-                  .Where(k => k.Id == kosherCertificationId).FirstOrDefault();
+                  .Where(k => k.Id == kosherCertificationId).Include(k=>k.Locations).FirstOrDefault();
         }
 
         public async Task<KosherCertification> GetKosherCertificationAsync(Guid kosherCertificationId)
@@ -80,10 +80,10 @@ namespace IsItKosherWebService.Services
             }
 
             return await _context.KosherCertifications
-                  .Where(k => k.Id == kosherCertificationId).FirstOrDefaultAsync();
+                  .Where(k => k.Id == kosherCertificationId).Include(k=>k.Locations).FirstOrDefaultAsync();
         }
 
-        public IEnumerable<KosherCertification> GetKosherCertification(KosherCertificationResourceParameters kosherCertificationResourseParams)
+        public IEnumerable<KosherCertification> GetKosherCertifications(KosherCertificationResourceParameters kosherCertificationResourseParams)
         {
 
             if (kosherCertificationResourseParams == null)
@@ -124,7 +124,7 @@ namespace IsItKosherWebService.Services
             if (!string.IsNullOrWhiteSpace(kosherCertificationResourseParams.Name))
             {
                 var name = kosherCertificationResourseParams.Name.Trim();
-                collection = _context.KosherCertifications.Where(k => k.Name == name);
+                collection = _context.KosherCertifications.Where(k => k.Name == name).Include(k=>k.Locations);
             }
             //search the koshercertificatons 
             if (!string.IsNullOrWhiteSpace(kosherCertificationResourseParams.SearchQuery))
@@ -136,8 +136,8 @@ namespace IsItKosherWebService.Services
                  || k.PhoneNumber.Contains(searchQuery)
                  || k.Locations.Any(l => l.Country.Contains(searchQuery)
                  || l.City.Contains(searchQuery)
-                 || l.ZipCode == int.Parse(searchQuery)
-                 || l.Street.Contains(searchQuery)));
+               //  || l.ZipCode == (searchQuery)
+                 || l.Street.Contains(searchQuery))).Include(k=>k.Locations);
 
 
             }

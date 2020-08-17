@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace IsItKosherWebService.Entities
@@ -25,7 +26,7 @@ namespace IsItKosherWebService.Entities
         public float Longitude { get; set; }//represent these as coordinates in the Dto 
         public float Latitude { get; set; }
 
-
+        [JsonIgnore]
         [ForeignKey("KosherCertificationId")]
         public KosherCertification KosherCertification { get; set; }
         public Guid KosherCertificationId { get; set; }

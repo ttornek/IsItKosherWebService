@@ -13,7 +13,7 @@ namespace IsItKosherWebService.Services
         void DeleteKosherCertification(KosherCertification kosherCertification);
         void Dispose();
         KosherCertification GetKosherCertification(Guid kosherCertificationId);
-        IEnumerable<KosherCertification> GetKosherCertification(KosherCertificationResourceParameters kosherCertificationResourseParams);
+        IEnumerable<KosherCertification> GetKosherCertifications(KosherCertificationResourceParameters kosherCertificationResourseParams);
         Task<KosherCertification> GetKosherCertificationAsync(Guid kosherCertificationId);
         IEnumerable<KosherCertification> GetKosherCertifications();
         Task<IEnumerable<KosherCertification>> GetKosherCertificationsAsync(KosherCertificationResourceParameters kosherCertificationResourceParams);

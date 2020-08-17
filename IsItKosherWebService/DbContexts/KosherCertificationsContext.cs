@@ -29,7 +29,7 @@ namespace IsItKosherWebService.DbContexts
                     PhoneNumber = "6462714233",
                     Name = "Ok Kosher",
                     RabbiLastName="Tornek"
-                    
+               
 
                 }) ;
             modelBuilder.Entity<Location>().HasData(

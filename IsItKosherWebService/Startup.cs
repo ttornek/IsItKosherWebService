@@ -57,7 +57,7 @@ namespace IsItKosherWebService
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+          //  app.UseHttpsRedirection();
 
             app.UseRouting();
 

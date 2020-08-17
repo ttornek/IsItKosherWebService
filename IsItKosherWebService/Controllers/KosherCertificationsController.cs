@@ -2,109 +2,69 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using IsItKosherWebService.Entities;
+using IsItKosherWebService.Models;
+using IsItKosherWebService.ResourceParameters;
+using IsItKosherWebService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using IsItKosherWebService.DbContexts;
-using IsItKosherWebService.Entities;
 
 namespace IsItKosherWebService.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/KosherCertifications")]
+
     public class KosherCertificationsController : ControllerBase
     {
-        private readonly KosherCertificationsContext _context;
-
-        public KosherCertificationsController(KosherCertificationsContext context)
+        private readonly IKosherCertificationRepository _kosherCertificationRepository;
+        private readonly IMapper _mapper;
+        public KosherCertificationsController(IKosherCertificationRepository kosherCertification, IMapper mapper)
         {
-            _context = context;
+            _kosherCertificationRepository = kosherCertification
+                ?? throw new ArgumentNullException(nameof(kosherCertification));
+            _mapper = mapper
+                ?? throw new ArgumentNullException(nameof(mapper));
         }
-
-        // GET: api/KosherCertifications
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<KosherCertification>>> GetKosherCertifications()
+        public async Task<ActionResult<IEnumerable<KosherCertification>>> GetKosherCertifications(
+            [FromQuery] KosherCertificationResourceParameters kosherCertificationResourceParameters)
         {
-            return await _context.KosherCertifications.ToListAsync();
+            var kosherCertsFromRepo = await _kosherCertificationRepository
+                .GetKosherCertificationsAsync(kosherCertificationResourceParameters);
+
+            return Ok(_mapper.Map<IEnumerable<KosherCertificationDto>>(kosherCertsFromRepo));
         }
 
-        // GET: api/KosherCertifications/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<KosherCertification>> GetKosherCertification(Guid id)
+        [HttpGet("{kosherCertificationId}", Name = "GetKosherCertification")]
+        public async Task<IActionResult> GetKosherCertificaiton(Guid kosherCertificationId)
         {
-            var kosherCertification = await _context.KosherCertifications.FindAsync(id);
-
+            var kosherCertification =
+                await _kosherCertificationRepository.GetKosherCertificationAsync(kosherCertificationId);
             if (kosherCertification == null)
             {
-                return NotFound();
-            }
+                throw new ArgumentNullException(nameof(kosherCertification));
 
-            return kosherCertification;
+            }
+            return Ok(_mapper.Map<KosherCertificationDto>(kosherCertification));
         }
 
-        // PUT: api/KosherCertifications/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutKosherCertification(Guid id, KosherCertification kosherCertification)
-        {
-            if (id != kosherCertification.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(kosherCertification).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!KosherCertificationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/KosherCertifications
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<KosherCertification>> PostKosherCertification(KosherCertification kosherCertification)
+        public async Task<ActionResult<KosherCertificationDto>> CreateKosherCertification(
+            KosherCertificationForCreationDto kosherCertification)
         {
-            _context.KosherCertifications.Add(kosherCertification);
-            await _context.SaveChangesAsync();
+            var kosherCertificationEntity = _mapper.Map<Entities.KosherCertification>(kosherCertification);
 
-            return CreatedAtAction("GetKosherCertification", new { id = kosherCertification.Id }, kosherCertification);
-        }
+            _kosherCertificationRepository.AddKosherCertification(kosherCertificationEntity);
 
-        // DELETE: api/KosherCertifications/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<KosherCertification>> DeleteKosherCertification(Guid id)
-        {
-            var kosherCertification = await _context.KosherCertifications.FindAsync(id);
-            if (kosherCertification == null)
-            {
-                return NotFound();
-            }
+            await _kosherCertificationRepository.SaveAsync();
 
-            _context.KosherCertifications.Remove(kosherCertification);
-            await _context.SaveChangesAsync();
+            var kosherCertificationToReturn = _mapper.Map<KosherCertificationDto>(kosherCertificationEntity);
 
-            return kosherCertification;
-        }
+            return CreatedAtRoute("GetKosherCertification",
+                new { kosherCertificationId = kosherCertificationToReturn.Id },
+                kosherCertificationToReturn);
 
-        private bool KosherCertificationExists(Guid id)
-        {
-            return _context.KosherCertifications.Any(e => e.Id == id);
         }
     }
 }

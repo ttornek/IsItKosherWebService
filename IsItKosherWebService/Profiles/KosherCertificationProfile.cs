@@ -13,8 +13,11 @@ namespace IsItKosherWebService.Profiles
         {
             CreateMap<Entities.KosherCertification, Models.KosherCertificationDto>()
                 .ForMember(
-                dest => dest.Name, opt => opt.MapFrom(
+                dest => dest.RabbiName, opt => opt.MapFrom(
                     src => $"{src.RabbiFirstName} {src.RabbiLastName}"));
+
+            CreateMap<Models.KosherCertificationForCreationDto, Entities.KosherCertification>();
+
 
 
         }
