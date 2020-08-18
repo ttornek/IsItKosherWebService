@@ -32,7 +32,7 @@ namespace IsItKosherWebService.Controllers
         {
             var kosherCertsFromRepo = await _kosherCertificationRepository
                 .GetKosherCertificationsAsync(kosherCertificationResourceParameters);
-
+          
             return Ok(_mapper.Map<IEnumerable<KosherCertificationDto>>(kosherCertsFromRepo));
         }
 
@@ -43,7 +43,7 @@ namespace IsItKosherWebService.Controllers
                 await _kosherCertificationRepository.GetKosherCertificationAsync(kosherCertificationId);
             if (kosherCertification == null)
             {
-                throw new ArgumentNullException(nameof(kosherCertification));
+                return NotFound();
 
             }
             return Ok(_mapper.Map<KosherCertificationDto>(kosherCertification));

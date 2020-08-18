@@ -13,9 +13,9 @@ namespace IsItKosherWebService.Models
         public string RabbiLastName { get; set; }
         public string PhoneNumber { get; set; }
 
-        public List<Location> Locations { get; set; }
-        = new List<Location>();
-        public List<KosherSymbol> KosherSymbols { get; set; }
-        = new List<KosherSymbol>();
+        public List<LocationForCreationDto> Locations { get; set; }
+        = new List<LocationForCreationDto>();
+        public List<KosherSymbolForCreationDto> KosherSymbols { get; set; }
+        = new List<KosherSymbolForCreationDto>();
     }
 }

@@ -13,10 +13,11 @@ namespace IsItKosherWebService.Profiles
         {
             CreateMap<Entities.Location, LocationDto>().ForMember(
                 dest => dest.Address, opt => opt.MapFrom(
-                    src => $"{src.Street} {src.City} {src.State}")).ForMember(
+                    src => $"{src.Street} {src.City} {src.State} {src.ZipCode}")).ForMember(
                dest => dest.Coordinates, opt => opt.MapFrom(
                    src => $"{src.Longitude},{src.Latitude}"));
 
+            CreateMap<LocationForCreationDto,Entities.Location>();
         }
     }
 }

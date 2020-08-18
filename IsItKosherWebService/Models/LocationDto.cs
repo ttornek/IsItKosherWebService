@@ -11,8 +11,8 @@ namespace IsItKosherWebService.Models
 
         public string Address { get; set; }
 
-        public int ZipCode { get; set; }
-
         public string Coordinates { get; set; }
+
+
     }
 }

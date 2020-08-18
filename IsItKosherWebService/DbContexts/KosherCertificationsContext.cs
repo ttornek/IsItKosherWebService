@@ -31,7 +31,19 @@ namespace IsItKosherWebService.DbContexts
                     RabbiLastName="Tornek"
                
 
-                }) ;
+                },
+                 new KosherCertification()
+                 {
+                     Id = Guid.Parse("da2fd609-d754-4feb-8acd-c4f9ff13ba96"),
+                     RabbiFirstName = "Rabbi Tova",
+                     PhoneNumber = "2628945438",
+                     Name = "Orthodox Union",
+                     RabbiLastName = "Tornek"
+
+
+                 }
+                ) ;
+           
             modelBuilder.Entity<Location>().HasData(
                 new Location
                 {
@@ -44,10 +56,25 @@ namespace IsItKosherWebService.DbContexts
                     Country="USA",
                     ZipCode=11225,
                     Street="1417 east 16th street"
-                }
+                },
+                  new Location
+                  {
+                      Id = Guid.Parse("5b1c2b4d-48c7-402a-80c3-cc796ad49c6b"),
+                      KosherCertificationId = Guid.Parse("da2fd609-d754-4feb-8acd-c4f9ff13ba96"),
+                      Longitude = -200,
+                      Latitude = 1000,
+                      City = "brooklyn",
+                      State = "Ny",
+                      Country = "USA",
+                      ZipCode = 11219,
+                      Street = "1166 50th street"
+                  }
+
+
                 
                 
                 );
+
 
             modelBuilder.Entity<KosherSymbol>().HasData(
 
@@ -57,7 +84,14 @@ namespace IsItKosherWebService.DbContexts
                     Id = Guid.Parse("d28888e9-2ba9-473a-a40f-e38cb54f9b35"),
                     KosherCertificationId = Guid.Parse("d28888e9-2ba9-473a-a40f-e38cb54f9b35"),
                     ImageDescription = "k inside of a circle"
-                }
+                },
+                 new KosherSymbol
+                 {
+                     Image = new byte[0],
+                     Id = Guid.Parse("40ff5488-fdab-45b5-bc3a-14302d59869a"),
+                     KosherCertificationId = Guid.Parse("da2fd609-d754-4feb-8acd-c4f9ff13ba96"),
+                     ImageDescription = "U inside of a circle"
+                 }
 
                 ) ;
             base.OnModelCreating(modelBuilder);

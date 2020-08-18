@@ -27,5 +27,6 @@ namespace IsItKosherWebService.Services
         Task<bool> KosherCertificationExistsAsync(Guid kosherCertificationId);
         bool Save();
         Task<bool> SaveAsync();
+        void AddKosherSymbol(Guid kosherCertificationId, KosherSymbol kosherSymbol);
     }
 }

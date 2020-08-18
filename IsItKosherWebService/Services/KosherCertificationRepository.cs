@@ -69,7 +69,7 @@ namespace IsItKosherWebService.Services
             }
 
             return _context.KosherCertifications
-                  .Where(k => k.Id == kosherCertificationId).Include(k=>k.Locations).FirstOrDefault();
+                  .Where(k => k.Id == kosherCertificationId).Include(k=>k.Locations).Include(k=>k.KosherSymbols).FirstOrDefault();
         }
 
         public async Task<KosherCertification> GetKosherCertificationAsync(Guid kosherCertificationId)
@@ -80,7 +80,7 @@ namespace IsItKosherWebService.Services
             }
 
             return await _context.KosherCertifications
-                  .Where(k => k.Id == kosherCertificationId).Include(k=>k.Locations).FirstOrDefaultAsync();
+                  .Where(k => k.Id == kosherCertificationId).FirstOrDefaultAsync();
         }
 
         public IEnumerable<KosherCertification> GetKosherCertifications(KosherCertificationResourceParameters kosherCertificationResourseParams)
@@ -112,7 +112,7 @@ namespace IsItKosherWebService.Services
             if (string.IsNullOrWhiteSpace(kosherCertificationResourceParams.Name)
                 && string.IsNullOrWhiteSpace(kosherCertificationResourceParams.SearchQuery))
             {
-                return GetKosherCertificationsAsync() as IEnumerable<KosherCertification>;//no idea if i should do this
+                return GetKosherCertificationsAsync() as IEnumerable<KosherCertification>;
             }
             return await BuildSearchCollection(kosherCertificationResourceParams).ToListAsync();
         }
@@ -124,7 +124,7 @@ namespace IsItKosherWebService.Services
             if (!string.IsNullOrWhiteSpace(kosherCertificationResourseParams.Name))
             {
                 var name = kosherCertificationResourseParams.Name.Trim();
-                collection = _context.KosherCertifications.Where(k => k.Name == name).Include(k=>k.Locations);
+                collection = _context.KosherCertifications.Where(k => k.Name == name);
             }
             //search the koshercertificatons 
             if (!string.IsNullOrWhiteSpace(kosherCertificationResourseParams.SearchQuery))
@@ -136,8 +136,8 @@ namespace IsItKosherWebService.Services
                  || k.PhoneNumber.Contains(searchQuery)
                  || k.Locations.Any(l => l.Country.Contains(searchQuery)
                  || l.City.Contains(searchQuery)
-               //  || l.ZipCode == (searchQuery)
-                 || l.Street.Contains(searchQuery))).Include(k=>k.Locations);
+                 || l.ZipCode.ToString().Contains(searchQuery)
+                 || l.Street.Contains(searchQuery)));
 
 
             }
@@ -267,6 +267,23 @@ namespace IsItKosherWebService.Services
                 // dispose resources when needed
             }
         }
+
+        public void AddKosherSymbol(Guid kosherCertificationId, KosherSymbol kosherSymbol)
+        {
+            if (kosherCertificationId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kosherCertificationId));
+            }
+            if (kosherSymbol == null)
+            {
+                throw new ArgumentNullException(nameof(kosherSymbol));
+            }
+
+            kosherSymbol.KosherCertificationId = kosherCertificationId;
+            _context.KosherSymbols.Add(kosherSymbol);
+        }
+
+
     }
 
 }

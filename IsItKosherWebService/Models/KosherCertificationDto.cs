@@ -12,8 +12,7 @@ namespace IsItKosherWebService.Models
         public string Name { get; set; }
         public long PhoneNumber { get; set; }
         public string RabbiName { get; set; }
-        public IEnumerable<LocationDto> Locations { get; set; }
-        public IEnumerable<KosherSymbol> KosherSymbols { get; set; }
+       
 
 
     }
